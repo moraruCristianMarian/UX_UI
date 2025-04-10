@@ -1,0 +1,16 @@
+﻿@model RestaurantManagerApp.Models.Product
+
+
+<div class="card">
+    <div class="card-body">
+        <h3 class="card-title alert-success py-3 px-3 rounded-2">@Model.Name</h3>
+        <div class="d-flex justify-content-between flex-row mt-3">
+            <div>
+                <i class="bi bi-layout-text-window-reverse"></i> @Model.Category
+            </div>
+            <div><i class="bi bi-cash-coin"></i> @Model.Cost RON</div>
+        </div>
+        <a class="btn btn-success mt-3" href="/Products/Show/@Model.Id">Informatii produs</a>
+    </div>
+</div>
+

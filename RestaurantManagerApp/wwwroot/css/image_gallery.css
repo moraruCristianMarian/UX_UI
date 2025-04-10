@@ -1,0 +1,46 @@
+﻿
+.image-restaurant-wrapper {
+    display: flex;
+    flex-direction: row;
+
+    overflow-x: auto;
+
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+.image-restaurant {
+    height: 200px;
+    max-width: 100%;
+    width: auto;
+
+    padding: 5px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.scroll-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+
+    width: 60px;
+    height: 60px;
+
+    text-align: center;
+    font-weight: bold;
+    font-size: 36px;
+
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+
+    cursor: pointer;
+}
+
+.left-scroll-button {
+    left: 0;
+}
+
+.right-scroll-button {
+    right: 0;
+}

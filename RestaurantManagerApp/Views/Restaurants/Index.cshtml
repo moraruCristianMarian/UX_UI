@@ -1,0 +1,17 @@
+﻿@{
+    ViewData["Title"] = "Restaurants Index";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Restaurants</h1>
+</div>
+
+@foreach (RestaurantManagerApp.Models.Restaurant rest in ViewBag.Restaurants)
+{
+    <div class="card">
+        @Html.Partial("RestaurantPartial", rest)
+        <a class="btn btn-success mt-3" href="/Restaurants/Show/@rest.Id">Informatii restaurant</a>
+    </div>
+
+    <br />
+}

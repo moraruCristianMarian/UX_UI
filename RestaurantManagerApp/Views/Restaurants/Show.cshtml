@@ -1,0 +1,63 @@
+﻿@model RestaurantManagerApp.Models.Restaurant
+
+<div class="card">
+    @Html.Partial("RestaurantPartial", Model) 
+</div>
+
+
+@if (Model.MenuProducts is not null && Model.MenuProducts.Count > 0)
+{
+    <div class="card m-3">
+        <h2 class="text-center m-3">Meniu</h2>
+        @foreach (var mp in Model.MenuProducts)
+            @if (mp.Product is not null)
+                @Html.Partial("ProductPartial", mp.Product)
+    </div>
+}
+else
+{
+    <div class="alert alert-info mt-3 p-3">
+        <div class="font-italic">Acest restaurant nu are un meniu specificat.</div>
+    </div>
+}
+
+
+@if (Model.Images is not null && Model.Images.Count > 0)
+{
+    <div class="card">
+        <div class="scroll-button left-scroll-button">&lt;</div>
+        <div class="image-restaurant-wrapper">
+            @foreach (var image in Model.Images)
+            {
+                <image class="image-restaurant" src="/img/@image.FilePath" alt="(Restaurant image)"></image>
+            }
+        </div>
+        <div class="scroll-button right-scroll-button">&gt;</div>
+    </div>
+}
+else
+{
+    <div class="alert alert-info mt-3 p-3">
+        <div class="font-italic">Acest restaurant nu are imagini incarcate.</div>
+    </div>
+}
+
+<hr />
+
+<div class="card">
+    <form asp-controller="Images" asp-action="New" method="POST" enctype="multipart/form-data">
+        <div class="card-body">
+            <input type="file" name="file"/>
+            <br />
+
+            <div class="card d-flex flex-row p-1 mt-2">
+                <label asp-for="Images.FirstOrDefault().Description" class="m-auto p-1 px-2"></label>
+                <input asp-for="Images.FirstOrDefault().Description" class="form-control align-self-center"/>
+            </div>
+        </div>
+        <div class="card-footer">
+            <input type="hidden" name="restaurantId" value="@Model.Id"/>
+            <button type="submit" class="btn-success">Incarca</button>
+        </div>
+    </form>
+</div>
