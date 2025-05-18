@@ -27,16 +27,22 @@ namespace RestaurantManagerApp.Controllers
             if ((rest == null) || (file == null))
                 return Redirect("/Restaurants/Index");
 
-            String fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
-            String filePath = Path.Combine("wwwroot/img", fileName);
+            String fileName = rest.Name + "_";
+            fileName += Guid.NewGuid().ToString().Substring(0, 8);
+            fileName += Path.GetExtension(file.FileName);
 
-            FileStream fs = new FileStream(filePath, FileMode.Create);
-            file.CopyTo(fs);
+            String filePath = Path.Combine("wwwroot/img", fileName);
 
             Image image = new Image(fileName, description, DateTime.Now.ToUniversalTime(), restaurantId);
 
             db.Images.Add(image);
             db.SaveChanges();
+
+            FileStream fs = new FileStream(filePath, FileMode.Create);
+            file.CopyTo(fs);
+
+            TempData["popup-type"] = "success";
+            TempData["message"] = "Imaginea a fost adăugată cu succes.";
 
             return Redirect("/Restaurants/Show/" + restaurantId);
         }

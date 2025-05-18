@@ -1,0 +1,134 @@
+﻿@model RestaurantManagerApp.Models.MenuProduct
+
+@if ((Model.Product != null) && (Model.Discount > 0))
+{
+    Model.Product.DiscountedCost = Model.Product.Cost;
+    Model.Product.DiscountedCost -= Convert.ToSingle(Math.Round(Model.Discount * Model.Product.Cost, 2));
+    Model.Product.DiscountedCost = float.Round(Model.Product.DiscountedCost ?? 0, 2);
+
+    if ((Model.PromotionEndDate != null) && (Model.PromotionEndDate > DateTime.Now))
+    {
+        TimeSpan timeDifference = (TimeSpan)(Model.PromotionEndDate - DateTime.Now);
+        if (timeDifference.TotalDays >= 1)
+            Model.DiscountTimeLeft = string.Format("{0} zile rămase", Math.Ceiling(timeDifference.TotalDays));
+        else if (timeDifference.TotalHours >= 1)
+            Model.DiscountTimeLeft = string.Format("{0} ore rămase", Math.Ceiling(timeDifference.TotalHours));
+    }
+}
+
+<div class="menuproduct-root">
+    @if ((Model.Discount > 0) && (Model.PromotionEndDate > DateTime.Now))
+    {
+        @if (Model.DiscountTimeLeft != null)
+        {
+            <i class="menuproduct-discount-date outlined-text">@Model.DiscountTimeLeft</i>
+        }
+
+        <div class="menuproduct-discount-bg">
+            <p class="menuproduct-discount-text outlined-text">
+                -@Math.Round(Model.Discount*100)%
+            </p>
+            @await Html.PartialAsync("ProductPartial", Model.Product)
+        </div>
+    }
+    else
+    {
+        @await Html.PartialAsync("ProductPartial", Model.Product)
+    }
+
+    @if (ViewBag.ShowAdminTools)
+    {
+        <div class="d-flex menuproduct-admin-tools" style="z-index: 3;">
+            <div>
+                <a class="btn btn-primary" href="/MenuProducts/Edit/@Model.ProductId/@Model.RestaurantId"
+                                                                style="margin-right: 15px">
+                    <i class="bi bi-pencil-square"></i>
+                </a>
+            </div>
+            <div>
+                <form method="post" action="/MenuProducts/Delete/@Model.ProductId/@Model.RestaurantId">
+                    <button class="btn btn-danger" type="submit">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    .menuproduct-root
+    {
+        position: relative;
+        width: 300px;
+        height: 300px;
+    }
+
+    .menuproduct-discount-bg
+    {
+        position: relative;
+    }
+
+    .menuproduct-discount-bg .child:not(.product)
+    {
+        z-index: 3;
+    }
+
+    .menuproduct-discount-bg::after
+    {
+        z-index: 2;
+
+        content: '';
+
+        position: absolute;
+        top: 0px;
+        right: 0px;
+
+        width: 0px;
+        height: 0px;
+
+        border-top: 100px solid red;
+        border-left: 100px solid transparent;
+    }
+
+    .menuproduct-discount-text
+    {
+        z-index: 3;
+
+        position: absolute;
+        top: 40px;
+        right: 0px;
+
+        font-size: 24px;
+        font-weight: bold;
+        color: white;
+
+        transform: rotate(45deg);
+        transform-origin: top right;
+    }
+
+    .menuproduct-discount-date
+    {
+        z-index: 2;
+
+        position: absolute;
+        bottom: 50px;
+        right: 10px;
+    }
+
+    .menuproduct-admin-tools
+    {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+    }
+    
+    .outlined-text
+    {
+        text-shadow: -1px -1px #000000,
+                      1px -1px #000000,
+                     -1px  1px #000000,
+                      1px  1px #000000;
+        color: #FFFFFF;
+    }
+</style>

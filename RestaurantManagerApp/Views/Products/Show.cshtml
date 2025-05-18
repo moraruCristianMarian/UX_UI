@@ -1,9 +1,17 @@
 ﻿@model RestaurantManagerApp.Models.Product
 
-<div class="card">
-    @Html.Partial("ProductPartial", Model)
-</div>
+@await Html.PartialAsync("ProductPartial", Model)
 
+@if (ViewBag.ShowAdminTools)
+{
+    <div class="d-flex flex-row justify-content-between p-3 border-1 border-top">
+        <a class="btn btn-success" href="/Products/Edit/@Model.Id">Editează produs</a>
+
+        <form method="post" action="/Products/Delete/@Model.Id">
+            <button class="btn btn-danger" type="submit">Șterge produs</button>
+        </form>
+    </div>
+}
 
 @if (Model.IngredientInProducts is not null && Model.IngredientInProducts.Count > 0)
 {
@@ -22,8 +30,35 @@
 }
 else
 {
-
     <div class="alert alert-info mt-3 p-3">
         <div class="font-italic">Acest produs nu are ingredientele specificate.</div>
+    </div>
+}
+
+
+<br />
+<br />
+<h3>Recenzii</h3>
+<hr />
+@{
+    ViewBag.ReviewedObjectId = Model.Id;
+    ViewBag.FormActionUrl = "/Products/Show/@Model.Id";
+    ViewBag.IsRestaurantReview = false;
+}
+@await Html.PartialAsync("ReviewFormPartial")
+
+@if (Model.Reviews is not null && Model.Reviews.Count > 0)
+{
+    <br />
+    <br />
+    @foreach (Review rev in Model.Reviews)
+    {
+        @await Html.PartialAsync("ReviewPartial", rev);
+    }
+}
+else
+{
+    <div class="alert alert-info mt-3 p-3">
+        <div class="font-italic">Acest produs nu are nicio recenzie.</div>
     </div>
 }

@@ -9,6 +9,7 @@
         public virtual ICollection<IngredientInProduct>? IngredientInProducts { get; set; }
 
 
+        public Ingredient() { }
         public Ingredient(string name)
         {
             Id = Guid.NewGuid();

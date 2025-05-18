@@ -1,0 +1,19 @@
+﻿@model RestaurantManagerApp.Models.MenuProduct
+
+@if (ViewBag.ShowAdminTools)
+{
+    <div class="d-flex flex-row justify-content-between p-3 border-1 border-top">
+        <a class="btn btn-success" href="/MenuProducts/Edit/@Model.ProductId/@Model.RestaurantId">Editează produs în meniu</a>
+
+        <form method="post" action="/MenuProducts/Delete/@Model.ProductId/@Model.RestaurantId">
+            <button class="btn btn-danger" type="submit">Șterge produs în meniu</button>
+        </form>
+    </div>
+}
+
+<div class="card">
+    <p>@Model.Product.Name</p>
+    <p>@Model.Restaurant.Name</p>
+    <p>@Model.Discount</p>
+    <p>@(Model.PromotionEndDate - new TimeSpan(3, 0, 0))</p>
+</div>

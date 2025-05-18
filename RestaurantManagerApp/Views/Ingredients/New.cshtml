@@ -1,0 +1,23 @@
+﻿@model RestaurantManagerApp.Models.Ingredient
+
+<h2 class="text-center mt-5">Adaugă un ingredient</h2>
+<br />
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-6 offset-3">
+            @using (Html.BeginForm(actionName: "New", controllerName: "Ingredients",
+            method: FormMethod.Post))
+            {
+                @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+
+                @Html.Label("Name", "Nume ingredient")
+                <br/>
+                @Html.TextBox("Name", null, new { @class = "form-control" })
+                @Html.ValidationMessageFor(i => i.Name, "", new { @class = "text-danger" })
+                <br/>
+
+                <button class="btn btn-success" type="submit">Adaugă</button>
+            }
+        </div>
+    </div>
+</div>

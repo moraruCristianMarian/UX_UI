@@ -1,0 +1,24 @@
+﻿@{
+    ViewData["Title"] = "Categorii de produse Index";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Categorii de produse</h1>
+</div>
+
+@if (ViewBag.ShowAdminTools)
+{
+    <div class="d-flex flex-row justify-content-between p-3">
+        <a class="btn btn-success" href="/ProductCategories/New">Adaugă o categorie de produse</a>
+    </div>
+}
+
+@foreach (RestaurantManagerApp.Models.ProductCategory pc in ViewBag.ProductCategories)
+{
+    <div class="card">
+        <p>@pc.Name</p>
+        <a class="btn btn-success mt-3" href="/ProductCategories/Show/@pc.Id">Informații categorie</a>
+    </div>
+
+    <br/>
+}

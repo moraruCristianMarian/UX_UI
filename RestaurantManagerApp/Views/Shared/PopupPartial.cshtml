@@ -1,0 +1,102 @@
+﻿<div id="popup">
+    @{
+        string popup_color, popup_type;
+        if (TempData["popup-type"] != null)
+            popup_type = TempData["popup-type"].ToString();
+        else
+            popup_type = "danger";
+            
+        switch (popup_type)
+        {
+            case "danger":
+                popup_color = "rgb(255, 128, 128)";
+                break;
+            case "success":
+                popup_color = "rgb(128, 224, 128)";
+                break;
+            case "warning":
+                popup_color = "rgb(224, 224, 128)";
+                break;
+            default:
+                popup_color = "rgb(128, 128, 192)";
+                break;
+        }
+    }
+    @if (TempData["message"] != null)
+    {
+        <div class="alert alert-info" style="background-color: @popup_color; color: white; font-size: 20px;">
+            @TempData["message"]
+        </div>
+    }
+</div>
+
+<style>
+    #popup
+    {
+        position: fixed;
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1000;
+        opacity: 0;
+        transition: opacity 1s;
+    }
+
+    #popup.fade-in
+    {
+        animation: fade-in 1s forwards;
+    }
+
+    #popup.fade-out
+    {
+        animation: fade-out 1s forwards;
+    }
+
+    @@keyframes fade-in
+    {
+        from
+        {
+            opacity: 0;
+        }
+        to
+        {
+            opacity: 1;
+        }
+    }
+
+    @@keyframes fade-out
+    {
+        from
+        {
+            opacity: 1;
+        }
+        to
+        {
+            opacity: 0;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function()
+    {
+        var popup = document.getElementById("popup");
+        if (popup)
+        {
+            popup.classList.add("fade-in");
+
+            setTimeout(function()
+            {
+                popup.classList.remove("fade-in");
+                popup.classList.add("fade-out");
+
+                setTimeout(function()
+                {
+                    popup.style.display = "none";
+                },
+                1000);
+            },
+            8000);
+        }
+    });
+</script>

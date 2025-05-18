@@ -1,0 +1,64 @@
+﻿@model RestaurantManagerApp.Models.Review
+
+<div class="card">
+    <div class="d-flex justify-content-between align-items-center card-header">
+        <div class="d-flex">
+            <div class="mr-3">
+                <i class="bi bi-person"></i>
+                <b>@Model.User.UserName</b>
+            </div>
+            <div>
+                @for (int i = 1; i <= Model.Rating; i++)
+                {
+                    <i class="bi bi-star-fill" style="color:gold"></i>
+                }
+                @for (int i = Model.Rating; i < 5; i++)
+                {
+                    <i class="bi bi-star"></i>
+                }
+            </div>
+        </div>
+        @if (Model.UserId == ViewBag.ThisUserId)
+        {
+            <div class="d-flex">
+                <div>
+                    <a class="btn btn-primary" href="/Reviews/Edit/@Model.Id" style="margin-right: 15px">
+                        <i class="bi bi-pencil-square"></i>
+                    </a>
+                </div>
+                <div>
+                    <form method="post" action="/Reviews/Delete/@Model.Id">
+                        <button class="btn btn-danger" type="submit">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        }
+        else if (ViewBag.ShowAdminTools)
+        {
+            <div>
+                <form method="post" action="/Reviews/Delete/@Model.Id">
+                    <button class="btn btn-danger" type="submit">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </form>
+            </div>
+        }
+    </div>
+    <p class="card-body m-0 pb-0">@Model.Description</p>
+
+    <div class="d-flex justify-content-end">
+        <i class="pb-2 pr-2 m-0">
+            @(Model.PostDate - new TimeSpan(3, 0, 0))
+        </i>
+        @if (Model.EditDate != null)
+        {
+            <i class ="pb-2 pr-2 m-0">
+                (Editat la @(Model.EditDate - new TimeSpan(3, 0, 0)))
+            </i>
+        }
+    </div>
+</div>
+<br />
+<br />

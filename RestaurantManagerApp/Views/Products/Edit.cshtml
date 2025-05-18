@@ -1,0 +1,134 @@
+﻿@model RestaurantManagerApp.Models.Product
+
+<h2 class="text-center mt-5">Modifică un produs</h2>
+<br />
+<div class="container">
+    <div class="row">
+        <div class="col-6 offset-3">
+            @using (Html.BeginForm(actionName: "Edit", controllerName: "Products",
+            method: FormMethod.Post, routeValues: new{ id = Model.Id }))
+            {
+                @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+
+                @Html.Label("Name", "Nume produs")
+                <br/>
+                @Html.TextBox("Name", null, new { @class = "form-control" })
+                @Html.ValidationMessageFor(p => p.Name, "", new { @class = "text-danger" })
+                <br />
+
+                @Html.Label("ProductCategoryId", "Categorie produs")
+                <br />
+                @Html.DropDownListFor(p => p.ProductCategoryId,
+                         new SelectList(Model.AllProductCategories, "Value", "Text"),
+                         "Alegeți o categorie", new { @class = "form-control" })
+                @Html.ValidationMessageFor(p => p.ProductCategoryId, "", new { @class = "text-danger" })
+                <br />                
+
+                @Html.Label("Cost", "Preț produs")
+                <br />
+                var costFormat = String.Format("{0:0.00}", Model.Cost);
+                @Html.TextBoxFor(p => p.Cost, costFormat, new { @class = "form-control" })
+                @Html.ValidationMessageFor(p => p.Cost, "", new { @class = "text-danger" })
+                <br />
+
+                <div class="card p-2">
+                    @Html.Label("Ingredients", "Ingrediente")
+                    <div id="ingredients-list">
+                        @if (Model.IngredientInProducts != null)
+                        {
+                            var IngredientInProductsList = Model.IngredientInProducts.Cast<IngredientInProduct>();
+                            for (var i = 0; i < IngredientInProductsList.Count(); i++)
+                            {
+                                var ingredientInProduct = IngredientInProductsList.ElementAt(i);
+                                if (ingredientInProduct != null && ingredientInProduct.Ingredient != null)
+                                {
+                                    <div class="form-group ingredient-item" style="display:flex; margin:0px">
+                                        <select name="FormIngredients[@i]" class="form-control">
+                                            @foreach (var ingredient in Model.AllIngredients)
+                                            {
+                                                @if (ingredient.Value == ingredientInProduct.IngredientId.ToString())
+                                                {
+                                                    <option selected value="@ingredient.Value">@ingredient.Text</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="@ingredient.Value">@ingredient.Text</option>
+                                                }
+                                            }
+                                        </select>
+                                        <button type="button" class="btn btn-danger" style="height:max-content"
+                                                onclick="removeIngredient(this)">Remove</button>
+                                        <br /><br />
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="form-group ingredient-item">
+                                        <span class="text-danger">An error occurred: Ingredient data is missing.</span>
+                                    </div>
+                                }
+                            }
+                        }
+                    </div>
+                    <button type="button" class="btn btn-secondary" onclick="addIngredient()">Adaugă un ingredient</button>
+                </div>
+
+                <br />
+                <button class="btn btn-success" type="submit">Modifică</button>
+            }
+        </div>
+    </div>
+</div>
+
+@section scripts
+{
+    <script>
+        let ingredientIndex = 0 + @Model.IngredientInProducts.Count;
+
+        function addIngredient()
+        {
+            const div = document.createElement("div");
+            div.classList.add("form-group", "ingredient-item");
+            div.style = "display:flex; margin:0px";
+
+            const ingredientElem = `
+                <select name="FormIngredients[${ingredientIndex}]" class="form-control">
+                    @foreach (var ingredient in Model.AllIngredients)
+                    {
+                        <option value="@ingredient.Value">@ingredient.Text</option>
+                    }
+                </select>
+                <button type="button" class="btn btn-danger" style="height:max-content" onclick="removeIngredient(this)">
+                    <i class="bi bi-trash"></i>
+                </button>
+                <br /><br />
+                `;
+
+            div.innerHTML = ingredientElem;
+
+            const ingredientList = document.getElementById("ingredients-list");
+            ingredientList.appendChild(div);
+
+            ingredientIndex++;
+            return div;
+        }
+
+        function removeIngredient(removeButton)
+        {
+            const ingredientItem = removeButton.parentElement;
+            const ingredientsList = document.getElementById("ingredients-list");
+            ingredientItem.remove();
+
+            const ingredientItems = ingredientsList.querySelectorAll('.ingredient-item');
+
+            for (i = 0; i < ingredientItems.length; i++)
+            {
+                const select = ingredientItems[i].querySelector('select');
+                if (select)
+                    select.name = `FormIngredients[${i}]`;
+            }
+
+            ingredientIndex--;
+        }
+    </script>
+}

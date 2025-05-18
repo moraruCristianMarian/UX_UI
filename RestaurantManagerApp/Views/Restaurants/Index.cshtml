@@ -6,11 +6,18 @@
     <h1 class="display-4">Restaurants</h1>
 </div>
 
+@if (ViewBag.ShowAdminTools)
+{
+    <div class="d-flex flex-row justify-content-between p-3">
+        <a class="btn btn-success" href="/Restaurants/New">Adaugă un restaurant</a>
+    </div>
+}
+
 @foreach (RestaurantManagerApp.Models.Restaurant rest in ViewBag.Restaurants)
 {
     <div class="card">
-        @Html.Partial("RestaurantPartial", rest)
-        <a class="btn btn-success mt-3" href="/Restaurants/Show/@rest.Id">Informatii restaurant</a>
+        @await Html.PartialAsync("RestaurantPartial", rest)
+        <a class="btn btn-success mt-3" href="/Restaurants/Show/@rest.Id">Informații restaurant</a>
     </div>
 
     <br />
