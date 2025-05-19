@@ -1,23 +1,17 @@
 ﻿@model RestaurantManagerApp.Models.Restaurant
 
 <div class="card">
-    @Html.Partial("RestaurantPartial", Model) 
+    @await Html.PartialAsync("RestaurantPartial", Model) 
 </div>
 
+@if (ViewBag.ShowAdminTools)
+{
+    <div class="d-flex flex-row justify-content-between p-3 border-1 border-top">
+        <a class="btn btn-success" href="/Restaurants/Edit/@Model.Id">Editează restaurant</a>
 
-@if (Model.MenuProducts is not null && Model.MenuProducts.Count > 0)
-{
-    <div class="card m-3">
-        <h2 class="text-center m-3">Meniu</h2>
-        @foreach (var mp in Model.MenuProducts)
-            @if (mp.Product is not null)
-                @Html.Partial("ProductPartial", mp.Product)
-    </div>
-}
-else
-{
-    <div class="alert alert-info mt-3 p-3">
-        <div class="font-italic">Acest restaurant nu are un meniu specificat.</div>
+        <form method="post" action="/Restaurants/Delete/@Model.Id">
+            <button class="btn btn-danger" type="submit">Șterge restaurant</button>
+        </form>
     </div>
 }
 
@@ -37,27 +31,90 @@ else
 }
 else
 {
-    <div class="alert alert-info mt-3 p-3">
-        <div class="font-italic">Acest restaurant nu are imagini incarcate.</div>
+    <div class="alert alert-warning mt-3 p-3">
+        <div class="font-italic">Acest restaurant nu are imagini încărcate.</div>
+    </div>
+}
+<hr />
+
+@if (ViewBag.ShowAdminTools)
+{
+    <div class="card">
+        <form asp-controller="Images" asp-action="New" method="POST" enctype="multipart/form-data">
+            <div class="card-body">
+                <input type="file" name="file" />
+                <br />
+
+                <div class="card d-flex flex-row p-1 mt-2">
+                    <label asp-for="Images.FirstOrDefault().Description" class="m-auto p-1 px-2"></label>
+                    <input asp-for="Images.FirstOrDefault().Description" class="form-control align-self-center" />
+                </div>
+            </div>
+            <div class="card-footer">
+                <input type="hidden" name="restaurantId" value="@Model.Id" />
+                <button type="submit" class="btn-success">Încarcă</button>
+            </div>
+        </form>
     </div>
 }
 
-<hr />
 
-<div class="card">
-    <form asp-controller="Images" asp-action="New" method="POST" enctype="multipart/form-data">
-        <div class="card-body">
-            <input type="file" name="file"/>
-            <br />
-
-            <div class="card d-flex flex-row p-1 mt-2">
-                <label asp-for="Images.FirstOrDefault().Description" class="m-auto p-1 px-2"></label>
-                <input asp-for="Images.FirstOrDefault().Description" class="form-control align-self-center"/>
+<div class="card m-3">
+    <div class="d-flex justify-content-between">
+        <h2 class="text-center m-3">Meniu</h2>
+        @if (ViewBag.ShowAdminTools)
+        {
+            <div class="d-flex flex-row justify-content-between p-3">
+                <a class="btn btn-success" href="@Url.Action("New", "MenuProducts", new { rid = Model.Id })">
+                    Adaugă un produs în meniu
+                </a>
             </div>
+        }
+    </div>
+
+    @if (Model.MenuProducts is not null && Model.MenuProducts.Count > 0)
+    {
+        <div id="menu" class="d-flex flex-wrap justify-content-around mb-4">
+            @foreach (var mp in Model.MenuProducts)
+            {
+                <div class="m-3">
+                    @await Html.PartialAsync("MenuProductPartial", mp)
+                </div>
+            }
         </div>
-        <div class="card-footer">
-            <input type="hidden" name="restaurantId" value="@Model.Id"/>
-            <button type="submit" class="btn-success">Incarca</button>
+    }
+    else
+    {
+        <div class="alert alert-warning mb-0 p-3">
+            <div class="font-italic">Acest restaurant nu are un meniu specificat.</div>
         </div>
-    </form>
+    }
 </div>
+
+
+<br />
+<br />
+<h3>Recenzii</h3>
+<hr />
+@{
+    ViewBag.ReviewedObjectId = Model.Id;
+    ViewBag.FormActionUrl = "/Restaurants/Show/@Model.Id";
+    ViewBag.IsRestaurantReview = true;
+}
+@await Html.PartialAsync("ReviewFormPartial")
+
+@if (Model.Reviews is not null && Model.Reviews.Count > 0)
+{
+    <br />
+    <br />
+    @foreach (Review rev in Model.Reviews)
+    {
+        @await Html.PartialAsync("ReviewPartial", rev);
+    }
+}
+else
+{
+    <div class="alert alert-warning mt-3 p-3">
+        <div class="font-italic">Acest restaurant nu are nicio recenzie.</div>
+    </div>
+}

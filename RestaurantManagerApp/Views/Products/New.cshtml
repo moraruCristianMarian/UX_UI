@@ -1,0 +1,102 @@
+﻿@model RestaurantManagerApp.Models.Product
+
+<h2 class="text-center mt-5">Adaugă un produs</h2>
+<br />
+<div class="container">
+    <div class="row">
+        <div class="col-6 offset-3">
+            @using (Html.BeginForm(actionName: "New", controllerName: "Products",
+            method: FormMethod.Post, new { enctype = "multipart/form-data" }))
+            {
+                @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+
+                @Html.Label("Name", "Nume produs")
+                <br/>
+                @Html.TextBox("Name", null, new { @class = "form-control" })
+                @Html.ValidationMessageFor(p => p.Name, "", new { @class = "text-danger" })
+                <br />
+
+                @Html.Label("ProductCategoryId", "Categorie produs")
+                <br />
+                @Html.DropDownListFor(p => p.ProductCategoryId,
+                         new SelectList(Model.AllProductCategories, "Value", "Text"),
+                         "Alegeți o categorie", new { @class = "form-control" })
+                @Html.ValidationMessageFor(p => p.ProductCategoryId, "", new { @class = "text-danger" })
+                <br />
+
+                @Html.Label("Cost", "Preț produs")
+                <br />
+                var costFormat = String.Format("{0:0.00}", Model.Cost);
+                @Html.TextBoxFor(p => p.Cost, costFormat, new { @class = "form-control" })
+                @Html.ValidationMessageFor(p => p.Cost, "", new { @class = "text-danger" })
+                <br />
+
+                @Html.Label("Image", "Imagine produs")
+                <br />
+                <input type="file" name="file" class="form-control" />
+                <br />
+
+                <div class="card p-2">
+                    @Html.Label("Ingredients", "Ingrediente")
+                    <div id="ingredients-list"> </div>
+                    <button type="button" class="btn btn-secondary" onclick="addIngredient()">Adaugă un ingredient</button>
+                </div>
+
+                <br />
+                <button class="btn btn-success" type="submit">Adaugă</button>
+            }
+        </div>
+    </div>
+</div>
+
+@section scripts
+{
+    <script>
+        let ingredientIndex = 0;
+
+        function addIngredient()
+        {
+            const div = document.createElement("div");
+            div.classList.add("form-group", "ingredient-item");
+            div.style = "display:flex; margin:0px";
+
+            const ingredientElem = `
+                <select name="FormIngredients[${ingredientIndex}]" class="form-control">
+                    @foreach (var ingredient in Model.AllIngredients)
+                    {
+                        <option value="@ingredient.Value">@ingredient.Text</option>
+                    }
+                </select>
+                <button type="button" class="btn btn-danger" style="height:max-content" onclick="removeIngredient(this)">
+                    <i class="bi bi-trash"></i>
+                </button>
+                <br /><br />
+                `;
+
+            div.innerHTML = ingredientElem;
+
+            const ingredientList = document.getElementById("ingredients-list");
+            ingredientList.appendChild(div);
+
+            ingredientIndex++;
+        }
+
+        function removeIngredient(removeButton)
+        {
+            const ingredientItem = removeButton.parentElement;
+            const ingredientsList = document.getElementById("ingredients-list");
+            ingredientItem.remove();
+
+            const ingredientItems = ingredientsList.querySelectorAll('.ingredient-item');
+
+            for (i = 0; i < ingredientItems.length; i++)
+            {
+                const select = ingredientItems[i].querySelector('select');
+                if (select)
+                    select.name = `FormIngredients[${i}]`;
+            }
+
+            ingredientIndex--;
+        }
+    </script>
+}

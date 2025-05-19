@@ -1,0 +1,27 @@
+﻿@{
+    ViewData["Title"] = "Produsele meniului Index";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Produse în meniu</h1>
+</div>
+
+@if (ViewBag.ShowAdminTools)
+{
+    <div class="d-flex flex-row justify-content-between p-3">
+        <a class="btn btn-success" href="/MenuProducts/New">Adaugă un produs în meniu</a>
+    </div>
+}
+
+@foreach (RestaurantManagerApp.Models.MenuProduct mp in ViewBag.MenuProducts)
+{
+    <div class="card">
+        <p>@mp.Product.Name</p>
+        <p>@mp.Restaurant.Name</p>
+        <p>@mp.Discount</p>
+        <p>@(mp.PromotionEndDate - new TimeSpan(3, 0, 0))</p>
+        <a class="btn btn-success mt-3" href="/MenuProducts/Show/@mp.ProductId/@mp.RestaurantId">Informații produs în meniu</a>
+    </div>
+
+    <br />
+}

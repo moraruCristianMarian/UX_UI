@@ -1,0 +1,16 @@
+﻿@model RestaurantManagerApp.Models.Ingredient
+
+@if (ViewBag.ShowAdminTools)
+{
+    <div class="d-flex flex-row justify-content-between p-3 border-1 border-top">
+        <a class="btn btn-success" href="/Ingredients/Edit/@Model.Id">Editeaza ingredient</a>
+
+        <form method="post" action="/Ingredients/Delete/@Model.Id">
+            <button class="btn btn-danger" type="submit">Sterge ingredient</button>
+        </form>
+    </div>
+}
+
+<div class="card">
+    @Model.Name
+</div>

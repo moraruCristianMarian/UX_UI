@@ -1,0 +1,24 @@
+﻿@{
+    ViewData["Title"] = "Ingrediente Index";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Ingrediente</h1>
+</div>
+
+@if (ViewBag.ShowAdminTools)
+{
+    <div class="d-flex flex-row justify-content-between p-3">
+        <a class="btn btn-success" href="/Ingredients/New">Adaugă un ingredient</a>
+    </div>
+}
+
+@foreach (RestaurantManagerApp.Models.Ingredient ing in ViewBag.Ingredients)
+{
+    <div class="card">
+        <p>@ing.Name</p>
+        <a class="btn btn-success mt-3" href="/Ingredients/Show/@ing.Id">Informații ingredient</a>
+    </div>
+
+    <br/>
+}

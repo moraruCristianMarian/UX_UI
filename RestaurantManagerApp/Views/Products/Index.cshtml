@@ -1,0 +1,23 @@
+﻿@{
+    ViewData["Title"] = "Produse Index";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Produse</h1>
+</div>
+
+@if (ViewBag.ShowAdminTools)
+{
+    <div class="d-flex flex-row justify-content-between p-3">
+        <a class="btn btn-success" href="/Products/New">Adaugă un produs</a>
+    </div>
+}
+
+@foreach (RestaurantManagerApp.Models.Product prod in ViewBag.Products)
+{
+    <div class="card">
+        @await Html.PartialAsync("ProductPartial", prod)
+    </div>
+
+    <br/>
+}

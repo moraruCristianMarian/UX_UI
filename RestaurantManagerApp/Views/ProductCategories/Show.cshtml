@@ -1,0 +1,16 @@
+﻿@model RestaurantManagerApp.Models.ProductCategory
+
+@if (ViewBag.ShowAdminTools)
+{
+    <div class="d-flex flex-row justify-content-between p-3 border-1 border-top">
+        <a class="btn btn-success" href="/ProductCategories/Edit/@Model.Id">Editează categorie de produse</a>
+
+        <form method="post" action="/ProductCategories/Delete/@Model.Id">
+            <button class="btn btn-danger" type="submit">Șterge categorie de produse</button>
+        </form>
+    </div>
+}
+
+<div class="card">
+    @Model.Name
+</div>

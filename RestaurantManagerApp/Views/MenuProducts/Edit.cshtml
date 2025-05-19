@@ -1,0 +1,33 @@
+﻿@model RestaurantManagerApp.Models.MenuProduct
+
+<h2 class="text-center mt-5">Modifică un produs din meniu</h2>
+<br />
+<div class="container">
+    <div class="row">
+        <div class="col-6 offset-3">
+            <h3>Produsul: @Model.Product.Name</h3>
+            <h3>Din restaurantul: @Model.Restaurant.Name</h3>
+
+            @using (Html.BeginForm(actionName: "Edit", controllerName: "MenuProducts",
+            method: FormMethod.Post, routeValues: new{ pid = Model.ProductId , rid = Model.RestaurantId}))
+            {
+                @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+
+                @Html.Label("Discount", "Discountul produsului în acest meniu")
+                <br />
+                var discountFormat = String.Format("{0:0.00}", Model.Discount);
+                @Html.TextBoxFor(mp => mp.Discount, discountFormat, new { @class = "form-control" })
+                @Html.ValidationMessageFor(mp => mp.Discount, "", new { @class = "text-danger" })
+                <br />
+
+                @Html.Label("PromotionEndDate", "Data limită a promoției")
+                <br />
+                @Html.EditorFor(mp => mp.PromotionEndDate, new { htmlAttributes = new { @class = "form-control", type = "datetime-local" } })
+                @Html.ValidationMessageFor(mp => mp.PromotionEndDate, "", new { @class = "text-danger" })
+                <br />
+
+                <button class="btn btn-success" type="submit">Modifică</button>
+            }
+        </div>
+    </div>
+</div>

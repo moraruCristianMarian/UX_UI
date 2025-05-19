@@ -11,10 +11,12 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = "Host=localhost;Port=5432;Database=UxUiDb;Username=postgres;Password=postgres";
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(connectionString));
+    options.UseNpgsql(connectionString,
+    o => o.UseNetTopologySuite()));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+builder.Services.AddDefaultIdentity<AppUser>(options => options.SignIn.RequireConfirmedAccount = true)
+    .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
 
@@ -23,6 +25,8 @@ builder.Services.AddSwaggerGen();
 
 
 var app = builder.Build();
+
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -58,91 +62,21 @@ app.MapControllerRoute(
     defaults: new { controller = "Products", action = "Index" });
 
 app.MapControllerRoute(
+    name: "ingredients",
+    pattern: "ingredients",
+    defaults: new { controller = "Ingredients", action = "Index" });
+
+app.MapControllerRoute(
+    name: "menuproducts",
+    pattern: "menuproducts",
+    defaults: new { controller = "MenuProducts", action = "Index" });
+
+app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 
 app.MapRazorPages();
-
-
-
-//  CREATE
-app.MapPost("/restaurant", async (ApplicationDbContext db, Restaurant r) =>
-{
-    db.Restaurants.Add(r);
-    await db.SaveChangesAsync();
-
-    return Results.Created($"/restaurant/{r.Id}", r);
-});
-//  CREATE
-app.MapPost("/product", async (ApplicationDbContext db, Product p) =>
-{
-    db.Products.Add(p);
-    await db.SaveChangesAsync();
-
-    return Results.Created($"/product/{p.Id}", p);
-});
-//  CREATE
-app.MapPost("/ingredient", async (ApplicationDbContext db, Ingredient i) =>
-{
-    db.Ingredients.Add(i);
-    await db.SaveChangesAsync();
-
-    return Results.Created($"/ingredient/{i.Id}", i);
-});
-//  CREATE
-app.MapPost("/menuproduct", async (ApplicationDbContext db, MenuProduct mp) =>
-{
-    db.MenuProducts.Add(mp);
-    await db.SaveChangesAsync();
-
-    return Results.Created($"/menuproduct/{mp.ProductId}_{mp.RestaurantId}", mp);
-});
-//  CREATE
-app.MapPost("/ingredientinproduct", async (ApplicationDbContext db, IngredientInProduct iip) =>
-{
-    db.IngredientInProducts.Add(iip);
-    await db.SaveChangesAsync();
-
-    return Results.Created($"/ingredientinproduct/{iip.IngredientId}_{iip.ProductId}", iip);
-});
-
-
-//  READ ALL
-app.MapGet("/restaurant", async (ApplicationDbContext db) =>
-{
-    return await db.Restaurants.ToListAsync();
-});
-
-//  READ ONE
-app.MapGet("/restaurant/{id}", (ApplicationDbContext db, Guid id) =>
-{
-    return db.Restaurants.Find(id);
-});
-
-//  UPDATE
-app.MapPut("/restaurant/{id}", async (ApplicationDbContext db, Restaurant r, Guid id) =>
-{
-    var updatedRestaurant = db.Restaurants.Find(id);
-    if (updatedRestaurant == null)
-        return;
-
-    updatedRestaurant.Name = r.Name;
-    updatedRestaurant.City = r.City;
-
-    await db.SaveChangesAsync();
-});
-
-//  DELETE
-app.MapDelete("/restaurant/{id}", async (ApplicationDbContext db, Guid id) =>
-{
-    var deletedRestaurant = db.Restaurants.Find(id);
-    if (deletedRestaurant == null)
-        return;
-
-    db.Restaurants.Remove(deletedRestaurant);
-    await db.SaveChangesAsync();
-});
 
 
 app.Run();

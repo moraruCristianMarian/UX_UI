@@ -10,6 +10,7 @@
         public virtual Product? Product { get; set; }
 
 
+        public IngredientInProduct() { }
         public IngredientInProduct(Guid ingredientId, Guid productId)
         {
             IngredientId = ingredientId;

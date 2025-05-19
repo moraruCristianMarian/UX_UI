@@ -1,0 +1,40 @@
+﻿@model RestaurantManagerApp.Models.MenuProduct
+
+<h2 class="text-center mt-5">Adaugă un produs din meniu</h2>
+<br />
+<div class="container">
+    <div class="row">
+        <div class="col-6 offset-3">
+            @using (Html.BeginForm(actionName: "New", controllerName: "MenuProducts",
+            method: FormMethod.Post))
+            {
+                @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+
+                @Html.HiddenFor(mp => mp.RestaurantId)
+
+                @Html.Label("ProductId", "Produs")
+                <br/>
+                @Html.DropDownListFor(mp => mp.ProductId,
+                         new SelectList(Model.AllProducts, "Value", "Text"),
+                         "Alegeți un produs", new { @class = "form-control" })
+                @Html.ValidationMessageFor(mp => mp.ProductId, "", new { @class = "text-danger" })
+                <br/>
+
+                @Html.Label("Discount", "Discountul produsului în acest meniu")
+                <br />
+                var discountFormat = String.Format("{0:0.00}", Model.Discount);
+                @Html.TextBoxFor(mp => mp.Discount, discountFormat, new { @class = "form-control" })
+                @Html.ValidationMessageFor(mp => mp.Discount, "", new { @class = "text-danger" })
+                <br />
+
+                @Html.Label("PromotionEndDate", "Data limită a promoției")
+                <br />
+                @Html.EditorFor(mp => mp.PromotionEndDate, new { htmlAttributes = new { @class = "form-control", type = "datetime-local" } })
+                @Html.ValidationMessageFor(mp => mp.PromotionEndDate, "", new { @class = "text-danger" })
+                <br />
+
+                <button class="btn btn-success" type="submit">Adaugă</button>
+            }
+        </div>
+    </div>
+</div>

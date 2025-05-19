@@ -1,0 +1,35 @@
+﻿@model RestaurantManagerApp.Models.Restaurant
+
+<h2 class="text-center mt-5">Modifică un restaurant</h2>
+<br />
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-6 offset-3">
+            @using (Html.BeginForm(actionName: "Edit", controllerName: "Restaurants",
+            method: FormMethod.Post, routeValues: new { id = Model.Id }))
+            {
+                @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+
+                @Html.Label("Name", "Nume ingredient")
+                <br />
+                @Html.TextBox("Name", null, new { @class = "form-control" })
+                @Html.ValidationMessageFor(r => r.Name, "", new { @class = "text-danger" })
+                <br />
+
+                @Html.Label("OpeningTime", "Oră deschidere")
+                <br />
+                @Html.EditorFor(r => r.OpeningTime, new { @class = "form-control", type = "datetime-local" })
+                @Html.ValidationMessageFor(r => r.OpeningTime, "", new { @class = "text-danger" })
+                <br />
+
+                @Html.Label("ClosingTime", "Oră închidere")
+                <br />
+                @Html.EditorFor(r => r.ClosingTime, new { @class = "form-control", type = "datetime-local" })
+                @Html.ValidationMessageFor(r => r.ClosingTime, "", new { @class = "text-danger" })
+                <br />
+
+                <button class="btn btn-success" type="submit">Modifică</button>
+            }
+        </div>
+    </div>
+</div>
