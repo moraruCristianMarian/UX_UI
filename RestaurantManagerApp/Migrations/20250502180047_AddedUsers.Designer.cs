@@ -13,15 +13,15 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace RestaurantManagerApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240529102256_UniqueProductAndIngredientNames")]
-    partial class UniqueProductAndIngredientNames
+    [Migration("20250502180047_AddedUsers")]
+    partial class AddedUsers
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.5")
+                .HasAnnotation("ProductVersion", "8.0.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "postgis");
@@ -47,9 +47,11 @@ namespace RestaurantManagerApp.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("FirstName")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("LastName")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<bool>("LockoutEnabled")
@@ -80,6 +82,9 @@ namespace RestaurantManagerApp.Migrations
 
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("boolean");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
@@ -136,9 +141,6 @@ namespace RestaurantManagerApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Name")
-                        .IsUnique();
-
                     b.ToTable("Ingredients");
                 });
 
@@ -168,7 +170,7 @@ namespace RestaurantManagerApp.Migrations
                     b.Property<float>("Discount")
                         .HasColumnType("real");
 
-                    b.Property<DateTime?>("PromotionEndDate")
+                    b.Property<DateTime>("PromotionEndDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("ProductId", "RestaurantId");
@@ -197,9 +199,6 @@ namespace RestaurantManagerApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Name")
-                        .IsUnique();
-
                     b.ToTable("Products");
                 });
 
@@ -209,80 +208,21 @@ namespace RestaurantManagerApp.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<TimeSpan?>("ClosingTime")
-                        .HasColumnType("interval");
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<Polygon>("Geom")
+                        .IsRequired()
                         .HasColumnType("geometry(Polygon, 4326)");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<TimeSpan?>("OpeningTime")
-                        .HasColumnType("interval");
-
                     b.HasKey("Id");
 
                     b.ToTable("Restaurants");
-                });
-
-            modelBuilder.Entity("RestaurantManagerApp.Models.Review", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("Rating")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("ReviewedObjectTypeId")
-                        .HasColumnType("integer");
-
-                    b.Property<Guid?>("ReviewedProductId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("ReviewedRestaurantId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ReviewedObjectTypeId");
-
-                    b.HasIndex("ReviewedProductId");
-
-                    b.HasIndex("ReviewedRestaurantId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Review", t =>
-                        {
-                            t.HasCheckConstraint("CK_Poly_RestaurantOrProduct", "(\"ReviewedObjectTypeId\" = 1 AND \"ReviewedRestaurantId\" IS NOT NULL AND \"ReviewedProductId\" IS NULL) OR(\"ReviewedObjectTypeId\" = 2 AND \"ReviewedRestaurantId\" IS NULL AND \"ReviewedProductId\" IS NOT NULL)");
-                        });
-                });
-
-            modelBuilder.Entity("RestaurantManagerApp.Models.ReviewedObjectType", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ReviewedObjectType");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -470,35 +410,6 @@ namespace RestaurantManagerApp.Migrations
                     b.Navigation("Restaurant");
                 });
 
-            modelBuilder.Entity("RestaurantManagerApp.Models.Review", b =>
-                {
-                    b.HasOne("RestaurantManagerApp.Models.ReviewedObjectType", "ReviewedObjectType")
-                        .WithMany()
-                        .HasForeignKey("ReviewedObjectTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("RestaurantManagerApp.Models.Product", "ReviewedProduct")
-                        .WithMany("Reviews")
-                        .HasForeignKey("ReviewedProductId");
-
-                    b.HasOne("RestaurantManagerApp.Models.Restaurant", "ReviewedRestaurant")
-                        .WithMany("Reviews")
-                        .HasForeignKey("ReviewedRestaurantId");
-
-                    b.HasOne("RestaurantManagerApp.Models.AppUser", "User")
-                        .WithMany("Reviews")
-                        .HasForeignKey("UserId");
-
-                    b.Navigation("ReviewedObjectType");
-
-                    b.Navigation("ReviewedProduct");
-
-                    b.Navigation("ReviewedRestaurant");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -550,11 +461,6 @@ namespace RestaurantManagerApp.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("RestaurantManagerApp.Models.AppUser", b =>
-                {
-                    b.Navigation("Reviews");
-                });
-
             modelBuilder.Entity("RestaurantManagerApp.Models.Ingredient", b =>
                 {
                     b.Navigation("IngredientInProducts");
@@ -565,8 +471,6 @@ namespace RestaurantManagerApp.Migrations
                     b.Navigation("IngredientInProducts");
 
                     b.Navigation("MenuProducts");
-
-                    b.Navigation("Reviews");
                 });
 
             modelBuilder.Entity("RestaurantManagerApp.Models.Restaurant", b =>
@@ -574,8 +478,6 @@ namespace RestaurantManagerApp.Migrations
                     b.Navigation("Images");
 
                     b.Navigation("MenuProducts");
-
-                    b.Navigation("Reviews");
                 });
 #pragma warning restore 612, 618
         }

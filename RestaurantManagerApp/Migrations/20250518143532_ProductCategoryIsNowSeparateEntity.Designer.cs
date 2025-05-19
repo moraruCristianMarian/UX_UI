@@ -13,8 +13,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace RestaurantManagerApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240531070323_AddedImageFilePathToProduct")]
-    partial class AddedImageFilePathToProduct
+    [Migration("20250518143532_ProductCategoryIsNowSeparateEntity")]
+    partial class ProductCategoryIsNowSeparateEntity
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -184,16 +184,34 @@ namespace RestaurantManagerApp.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Category")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<float>("Cost")
                         .HasColumnType("real");
 
                     b.Property<string>("ImageFilePath")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<Guid?>("ProductCategoryId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.HasIndex("ProductCategoryId");
+
+                    b.ToTable("Products");
+                });
+
+            modelBuilder.Entity("RestaurantManagerApp.Models.ProductCategory", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -201,10 +219,7 @@ namespace RestaurantManagerApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Name")
-                        .IsUnique();
-
-                    b.ToTable("Products");
+                    b.ToTable("ProductCategory");
                 });
 
             modelBuilder.Entity("RestaurantManagerApp.Models.Restaurant", b =>
@@ -480,6 +495,15 @@ namespace RestaurantManagerApp.Migrations
                     b.Navigation("Restaurant");
                 });
 
+            modelBuilder.Entity("RestaurantManagerApp.Models.Product", b =>
+                {
+                    b.HasOne("RestaurantManagerApp.Models.ProductCategory", "ProductCategory")
+                        .WithMany("Products")
+                        .HasForeignKey("ProductCategoryId");
+
+                    b.Navigation("ProductCategory");
+                });
+
             modelBuilder.Entity("RestaurantManagerApp.Models.Review", b =>
                 {
                     b.HasOne("RestaurantManagerApp.Models.ReviewedObjectType", "ReviewedObjectType")
@@ -577,6 +601,11 @@ namespace RestaurantManagerApp.Migrations
                     b.Navigation("MenuProducts");
 
                     b.Navigation("Reviews");
+                });
+
+            modelBuilder.Entity("RestaurantManagerApp.Models.ProductCategory", b =>
+                {
+                    b.Navigation("Products");
                 });
 
             modelBuilder.Entity("RestaurantManagerApp.Models.Restaurant", b =>

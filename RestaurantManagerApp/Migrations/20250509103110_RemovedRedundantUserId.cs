@@ -11,6 +11,10 @@ namespace RestaurantManagerApp.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropForeignKey(
+                name: "FK_Review_AspNetUsers_UserId",
+                table: "Review");
+
             migrationBuilder.DropColumn(
                 name: "UserId",
                 table: "AspNetUsers");
@@ -35,6 +39,10 @@ namespace RestaurantManagerApp.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropForeignKey(
+                name: "FK_Review_AspNetUsers_UserId",
+                table: "Review");
+
             migrationBuilder.AlterColumn<Guid>(
                 name: "UserId",
                 table: "Review",

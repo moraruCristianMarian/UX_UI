@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using NetTopologySuite.Geometries;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
@@ -12,8 +13,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace RestaurantManagerApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240118093248_FirstMigrationMVC")]
-    partial class FirstMigrationMVC
+    [Migration("20250501181742_AddedGeometryToRestaurants")]
+    partial class AddedGeometryToRestaurants
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -23,7 +24,108 @@ namespace RestaurantManagerApp.Migrations
                 .HasAnnotation("ProductVersion", "8.0.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
+            NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "postgis");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("RestaurantManagerApp.Models.Image", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("RestaurantId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("UploadDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RestaurantId");
+
+                    b.ToTable("Images");
+                });
+
+            modelBuilder.Entity("RestaurantManagerApp.Models.Ingredient", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Ingredients");
+                });
+
+            modelBuilder.Entity("RestaurantManagerApp.Models.IngredientInProduct", b =>
+                {
+                    b.Property<Guid>("IngredientId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("IngredientId", "ProductId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("IngredientInProducts");
+                });
+
+            modelBuilder.Entity("RestaurantManagerApp.Models.MenuProduct", b =>
+                {
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("RestaurantId")
+                        .HasColumnType("uuid");
+
+                    b.Property<float>("Discount")
+                        .HasColumnType("real");
+
+                    b.Property<DateTime>("PromotionEndDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("ProductId", "RestaurantId");
+
+                    b.HasIndex("RestaurantId");
+
+                    b.ToTable("MenuProducts");
+                });
+
+            modelBuilder.Entity("RestaurantManagerApp.Models.Product", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<float>("Cost")
+                        .HasColumnType("real");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Products");
+                });
 
             modelBuilder.Entity("RestaurantManagerApp.Models.Restaurant", b =>
                 {
@@ -34,6 +136,10 @@ namespace RestaurantManagerApp.Migrations
                     b.Property<string>("City")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<Geometry>("Geom")
+                        .IsRequired()
+                        .HasColumnType("geometry");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -244,6 +350,55 @@ namespace RestaurantManagerApp.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("RestaurantManagerApp.Models.Image", b =>
+                {
+                    b.HasOne("RestaurantManagerApp.Models.Restaurant", "Restaurant")
+                        .WithMany("Images")
+                        .HasForeignKey("RestaurantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Restaurant");
+                });
+
+            modelBuilder.Entity("RestaurantManagerApp.Models.IngredientInProduct", b =>
+                {
+                    b.HasOne("RestaurantManagerApp.Models.Ingredient", "Ingredient")
+                        .WithMany("IngredientInProducts")
+                        .HasForeignKey("IngredientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("RestaurantManagerApp.Models.Product", "Product")
+                        .WithMany("IngredientInProducts")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Ingredient");
+
+                    b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("RestaurantManagerApp.Models.MenuProduct", b =>
+                {
+                    b.HasOne("RestaurantManagerApp.Models.Product", "Product")
+                        .WithMany("MenuProducts")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("RestaurantManagerApp.Models.Restaurant", "Restaurant")
+                        .WithMany("MenuProducts")
+                        .HasForeignKey("RestaurantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+
+                    b.Navigation("Restaurant");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -293,6 +448,25 @@ namespace RestaurantManagerApp.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("RestaurantManagerApp.Models.Ingredient", b =>
+                {
+                    b.Navigation("IngredientInProducts");
+                });
+
+            modelBuilder.Entity("RestaurantManagerApp.Models.Product", b =>
+                {
+                    b.Navigation("IngredientInProducts");
+
+                    b.Navigation("MenuProducts");
+                });
+
+            modelBuilder.Entity("RestaurantManagerApp.Models.Restaurant", b =>
+                {
+                    b.Navigation("Images");
+
+                    b.Navigation("MenuProducts");
                 });
 #pragma warning restore 612, 618
         }

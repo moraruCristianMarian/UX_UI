@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using NetTopologySuite.Geometries;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
@@ -12,8 +13,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace RestaurantManagerApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240118195151_AddedIngredientAndIngredientInProduct")]
-    partial class AddedIngredientAndIngredientInProduct
+    [Migration("20250501182910_ChangedRestaurantGeometryToPolygon4326")]
+    partial class ChangedRestaurantGeometryToPolygon4326
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -23,7 +24,35 @@ namespace RestaurantManagerApp.Migrations
                 .HasAnnotation("ProductVersion", "8.0.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
+            NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "postgis");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("RestaurantManagerApp.Models.Image", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("RestaurantId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("UploadDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RestaurantId");
+
+                    b.ToTable("Images");
+                });
 
             modelBuilder.Entity("RestaurantManagerApp.Models.Ingredient", b =>
                 {
@@ -107,6 +136,10 @@ namespace RestaurantManagerApp.Migrations
                     b.Property<string>("City")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<Polygon>("Geom")
+                        .IsRequired()
+                        .HasColumnType("geometry(Polygon, 4326)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -317,6 +350,17 @@ namespace RestaurantManagerApp.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("RestaurantManagerApp.Models.Image", b =>
+                {
+                    b.HasOne("RestaurantManagerApp.Models.Restaurant", "Restaurant")
+                        .WithMany("Images")
+                        .HasForeignKey("RestaurantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Restaurant");
+                });
+
             modelBuilder.Entity("RestaurantManagerApp.Models.IngredientInProduct", b =>
                 {
                     b.HasOne("RestaurantManagerApp.Models.Ingredient", "Ingredient")
@@ -420,6 +464,8 @@ namespace RestaurantManagerApp.Migrations
 
             modelBuilder.Entity("RestaurantManagerApp.Models.Restaurant", b =>
                 {
+                    b.Navigation("Images");
+
                     b.Navigation("MenuProducts");
                 });
 #pragma warning restore 612, 618

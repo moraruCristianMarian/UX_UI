@@ -13,8 +13,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace RestaurantManagerApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240526071511_AddedReviews")]
-    partial class AddedReviews
+    [Migration("20250516102256_UniqueProductAndIngredientNames")]
+    partial class UniqueProductAndIngredientNames
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -81,9 +81,6 @@ namespace RestaurantManagerApp.Migrations
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("boolean");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
@@ -139,6 +136,9 @@ namespace RestaurantManagerApp.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Name")
+                        .IsUnique();
+
                     b.ToTable("Ingredients");
                 });
 
@@ -168,7 +168,7 @@ namespace RestaurantManagerApp.Migrations
                     b.Property<float>("Discount")
                         .HasColumnType("real");
 
-                    b.Property<DateTime>("PromotionEndDate")
+                    b.Property<DateTime?>("PromotionEndDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("ProductId", "RestaurantId");
@@ -197,6 +197,9 @@ namespace RestaurantManagerApp.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Name")
+                        .IsUnique();
+
                     b.ToTable("Products");
                 });
 
@@ -206,17 +209,18 @@ namespace RestaurantManagerApp.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("City")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<TimeSpan?>("ClosingTime")
+                        .HasColumnType("interval");
 
                     b.Property<Polygon>("Geom")
-                        .IsRequired()
                         .HasColumnType("geometry(Polygon, 4326)");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<TimeSpan?>("OpeningTime")
+                        .HasColumnType("interval");
 
                     b.HasKey("Id");
 
@@ -245,8 +249,8 @@ namespace RestaurantManagerApp.Migrations
                     b.Property<Guid?>("ReviewedRestaurantId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -484,8 +488,7 @@ namespace RestaurantManagerApp.Migrations
 
                     b.HasOne("RestaurantManagerApp.Models.AppUser", "User")
                         .WithMany("Reviews")
-                        .HasForeignKey("UserId")
-                        .HasPrincipalKey("UserId");
+                        .HasForeignKey("UserId");
 
                     b.Navigation("ReviewedObjectType");
 

@@ -62,6 +62,7 @@ namespace RestaurantManagerApp.Controllers
             {
                 Restaurant rest = db.Restaurants.Include("MenuProducts")
                                                 .Include("MenuProducts.Product")
+                                                .Include("MenuProducts.Product.ProductCategory")
                                                 .Include("Images")
                                                 .Include("Reviews")
                                                 .Include("Reviews.User")

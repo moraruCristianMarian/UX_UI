@@ -13,8 +13,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace RestaurantManagerApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240531071847_NullableImageFilePathForProducts")]
-    partial class NullableImageFilePathForProducts
+    [Migration("20250517073420_AddedPostAndEditDatesToReviews")]
+    partial class AddedPostAndEditDatesToReviews
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -190,9 +190,6 @@ namespace RestaurantManagerApp.Migrations
 
                     b.Property<float>("Cost")
                         .HasColumnType("real");
-
-                    b.Property<string>("ImageFilePath")
-                        .HasColumnType("text");
 
                     b.Property<string>("Name")
                         .IsRequired()
